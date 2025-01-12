@@ -1,6 +1,9 @@
 #pragma once
 
+
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 
 class Game {
 
@@ -10,6 +13,7 @@ private:
     sf::Event event;
     sf::ContextSettings settings;
     void InitWindow();
+    sf::Font font;
 
 
 

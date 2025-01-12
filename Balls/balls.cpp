@@ -1,9 +1,12 @@
 #include "balls.h"
 #include <cstdlib>
 #include <iostream>
+#include <random>
+
 
 Ball::Ball(float radius, sf::Vector2f startPosition, sf::Vector2f startVelocity, sf::Color color)
 {
+
 
 	this->circle.setRadius(radius);
 	this->circle.setOrigin(radius, radius);

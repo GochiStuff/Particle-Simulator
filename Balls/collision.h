@@ -2,8 +2,16 @@
 #include "balls.h"
 
 
-//TO manage all collisions.
+class CollsionCheck
+{
+private:
+	float x, y;
+	float radius;
+	sf::CircleShape circle;
 
-//Particle Particle collision
+public:
+	CollsionCheck(std::vector<Ball>& balls);
+	~CollsionCheck();
 
-void CheckCollisionPP( std::vector<Ball>& balls);
+};
+
