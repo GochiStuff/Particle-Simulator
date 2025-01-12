@@ -10,17 +10,17 @@
 constexpr auto WindowH = 1000;
 constexpr auto WindowW = 1500;
 const float fps_limit = 120;
-bool isCollisionAllowed = true;
+bool isCollisionAllowed = false;
 bool showGrid = false;
 const float cor = 1;
 bool showStats = true; // S for showing the stats .
 
 
 // Balls
-const int numberOfBalls = 3;
-const float radius = 10.0;
+const int numberOfBalls = 69000;
+const float radius = 1.0f;
 const sf::Vector2f startPos = { 300, 300 };
-const sf::Vector2f startVel = { 1000, 1000 };
+const sf::Vector2f startVel = { 1, 1 };
 const int velRandomFactor = 169; 
 const int posRandomFactor = 169; 
 std::vector<sf::Color> colours = {
