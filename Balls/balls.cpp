@@ -52,8 +52,6 @@ void Ball::move(sf::Vector2f boundX, sf::Vector2f boundY, float deltaTime) {
     this->circle.setPosition(position);
 }
 
-
-
 sf::CircleShape Ball::draw()
 {
     return this->circle;
@@ -61,12 +59,23 @@ sf::CircleShape Ball::draw()
 
 sf::Vector2f Ball::getPosition() const
 {
-	return sf::Vector2f();
+	return this->circle.getPosition();
 }
 
 float Ball::getRadius() const
 {
 	return this->circle.getRadius();
 }
+
+sf::Vector2f Ball::getVelocity() const
+{
+    return this->velocity;
+}
+
+void Ball::setVelocity(const sf::Vector2f& vel)
+{
+    this->velocity = vel;
+}
+
 
 

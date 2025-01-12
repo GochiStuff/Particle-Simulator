@@ -7,19 +7,20 @@
 #include<algorithm>
 
 //IMPORTANT
-constexpr auto WindowH = 600;
-constexpr auto WindowW = 800;
-const float fps_limit = 60;
-const bool collisionChecking = false;
+constexpr auto WindowH = 1000;
+constexpr auto WindowW = 1500;
+const float fps_limit = 120;
+bool isCollisionAllowed = true;
+bool showGrid = false;
 const float cor = 1;
 bool showStats = true; // S for showing the stats .
 
 
 // Balls
-const int numberOfBalls = 4;
+const int numberOfBalls = 3;
 const float radius = 10.0;
 const sf::Vector2f startPos = { 300, 300 };
-const sf::Vector2f startVel = { 300, 105 };
+const sf::Vector2f startVel = { 1000, 1000 };
 const int velRandomFactor = 169; 
 const int posRandomFactor = 169; 
 std::vector<sf::Color> colours = {
@@ -47,7 +48,7 @@ void Game::InitWindow()
 	this->settings.antialiasingLevel = 4;
 	this->window = new sf::RenderWindow(sf::VideoMode(WindowW, WindowH), "TheGame", sf::Style::Close, settings);
 	this->window->setVerticalSyncEnabled(this->Vsync);
-	this->window->setFramerateLimit(60);
+	this->window->setFramerateLimit(fps_limit);
 
 	if (!this->font.loadFromFile("assets/myfont.ttf")) {
 		std::cerr << " ERROR : NO FONT LOADED !!";
@@ -84,6 +85,10 @@ void Game::CheckWindowPoll()
 				this->window->close();
 			if (this->event.key.code == sf::Keyboard::S) {
 				showStats = !showStats;
+			}if (this->event.key.code == sf::Keyboard::G) {
+				showGrid = !showGrid;
+			}if (this->event.key.code == sf::Keyboard::D) {
+				isCollisionAllowed = !isCollisionAllowed;
 			}
 
 			break;
@@ -98,7 +103,7 @@ bool Game::isWindowOpen()
 
 static void GameInit()
 {
-	int t = colours.size();
+	const int t = colours.size();
 	for (int i = 0; i < numberOfBalls; i++) {
 
 		int colorIndex = rand() % t;
@@ -123,12 +128,14 @@ void Game::Update()
 	// Window check and update
 	this->CheckWindowPoll();
 	this->window->clear(bg_colour);
-	
-	
+
+	if (isCollisionAllowed) {
+		//Check for collision 
 		
+		CollisionCheck collision(balls , *this ,showGrid);
+	}
 
-
-	float deltaTime = 1.0f / 60.0f;
+	float deltaTime = this->clock.restart().asSeconds();
 	for (auto& ball : balls) {
 		ball.move({ 0 , WindowW },
 			{ 0,WindowH}, deltaTime);
@@ -142,7 +149,7 @@ void Game::Update()
 	//TODO : add the feature to see the current stats  !! i.e. FPS and load
 	if (showStats)
 	{
-		sf::Text windowDimText, fpsText, nOfBalls, collisionText, corText, statsToggleText;
+		sf::Text windowDimText, fpsText, nOfBalls, collisionText, showGrid_, corText, statsToggleText;
 
 		// Initialize stats texts in GameInit() or InitWindow()
 
@@ -152,12 +159,15 @@ void Game::Update()
 		corText.setCharacterSize(12);
 		statsToggleText.setCharacterSize(12);
 		nOfBalls.setCharacterSize(12);
+		showGrid_.setCharacterSize(12);
+
 
 		windowDimText.setFont(font);
 		fpsText.setFont(font);
 		collisionText.setFont(font);
 		corText.setFont(font);
 		statsToggleText.setFont(font);
+		showGrid_.setFont(font);
 		nOfBalls.setFont(font);
 
 		windowDimText.setFillColor(sf::Color::White);
@@ -166,6 +176,7 @@ void Game::Update()
 		corText.setFillColor(sf::Color::White);
 		statsToggleText.setFillColor(sf::Color::White);
 		nOfBalls.setFillColor(sf::Color::White);
+		showGrid_.setFillColor(sf::Color::White);
 
 		// Set positions
 		windowDimText.setPosition(10, 10);
@@ -173,13 +184,15 @@ void Game::Update()
 		collisionText.setPosition(10, 50);
 		corText.setPosition(10, 70);
 		statsToggleText.setPosition(10, 90);
-		nOfBalls.setPosition(10, 110);
+		nOfBalls.setPosition(10, 90);
+		showGrid_.setPosition(10, 110);
 
 
 		// Update strings based on values
-		std::string windowDimensions = "Window: " + std::to_string(WindowW) + " x " + std::to_string(WindowH);
+		std::string windowDimensions = "( use S to toogle the stats ) || Window: " + std::to_string(WindowW) + " x " + std::to_string(WindowH);
 		std::string fpsStr = "FPS Limit: " + std::to_string(fps_limit);
-		std::string collisionStr = "Collision: " + std::string(collisionChecking ? "ON" : "OFF");
+		std::string collisionStr = "Collision ( use D to toogle ) : " + std::string(isCollisionAllowed ? "ON" : "OFF");
+		std::string grid = "Show Grid ( use G to toogle ) : " + std::string(showGrid ? "ON" : "OFF");
 		std::string corStr = "Coff of restitution : " + std::to_string(cor);
 		std::string ballstr = "Number of balls : " + std::to_string(numberOfBalls);
 
@@ -189,6 +202,7 @@ void Game::Update()
 		collisionText.setString(collisionStr);
 		corText.setString(corStr);
 		nOfBalls.setString(ballstr);
+		showGrid_.setString(grid);
 
 
 		// In the Update method, draw the stats if showStats is true
@@ -198,6 +212,7 @@ void Game::Update()
 		this->window->draw(collisionText);
 		this->window->draw(corText);
 		this->window->draw(nOfBalls);
+		this->window->draw(showGrid_);
 
 	}
 
@@ -206,4 +221,9 @@ void Game::Update()
 void Game::Render()
 {
 	this->window->display();
+}
+
+void Game::Draw( sf::CircleShape& circle)
+{
+	this->window->draw(circle);
 }

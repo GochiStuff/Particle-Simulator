@@ -19,5 +19,8 @@ public:
 	sf::CircleShape draw();
 	sf::Vector2f getPosition() const;
 	float getRadius() const;
+		
+	 sf::Vector2f getVelocity() const;
+	 void setVelocity(const sf::Vector2f& vel);
 
 };

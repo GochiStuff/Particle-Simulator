@@ -14,6 +14,7 @@ private:
     sf::ContextSettings settings;
     void InitWindow();
     sf::Font font;
+    sf::Clock clock;
 
 
 
@@ -26,6 +27,7 @@ public:
 
     void Update();
     void Render();
+    void Draw(sf::CircleShape& circle);
 };
 
 static void GameInit();
