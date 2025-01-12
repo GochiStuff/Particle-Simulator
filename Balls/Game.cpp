@@ -7,20 +7,20 @@
 #include<algorithm>
 
 //IMPORTANT
-constexpr auto WindowH = 1000;
-constexpr auto WindowW = 1500;
+constexpr auto WindowH = 600;
+constexpr auto WindowW = 800;
 const float fps_limit = 120;
 bool isCollisionAllowed = true;
-bool showGrid = false;
+bool showGrid = true;
 const float cor = 1;
 bool showStats = true; // S for showing the stats .
 
 
 // Balls
-const int numberOfBalls = 3;
-const float radius = 10.0;
+const int numberOfBalls = 1000;
+const float radius = 3.0;
 const sf::Vector2f startPos = { 300, 300 };
-const sf::Vector2f startVel = { 1000, 1000 };
+const sf::Vector2f startVel = { 0, 0 };
 const int velRandomFactor = 169; 
 const int posRandomFactor = 169; 
 std::vector<sf::Color> colours = {
@@ -223,7 +223,7 @@ void Game::Render()
 	this->window->display();
 }
 
-void Game::Draw( sf::CircleShape& circle)
+void Game::Draw( sf::RectangleShape& rect)
 {
-	this->window->draw(circle);
+	this->window->draw(rect);
 }

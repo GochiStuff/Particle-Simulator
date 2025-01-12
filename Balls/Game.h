@@ -27,7 +27,7 @@ public:
 
     void Update();
     void Render();
-    void Draw(sf::CircleShape& circle);
+    void Draw(sf::RectangleShape& circle);
 };
 
 static void GameInit();

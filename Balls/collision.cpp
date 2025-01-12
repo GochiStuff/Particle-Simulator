@@ -1,89 +1,100 @@
 #include "collision.h"
-#include <cmath>
-#include <iostream>
-#include <algorithm> 
-
 
 bool isGrid = false;
 
-CollisionCheck::CollisionCheck(std::vector<Ball>& balls , Game& game , bool& b) {
-
+CollisionCheck::CollisionCheck(std::vector<Ball>& balls, Game& game, bool& b) {
     isGrid = b;
-    this->root = std::make_unique<CollisionNode>(balls , game);
-    checkCollisions(root.get(), root.get()); 
+    this->root = std::make_unique<CollisionNode>(balls, game);
+    checkCollisions(root.get(), root.get());
 }
 
 void CollisionCheck::checkCollisions(const CollisionNode* n1, const CollisionNode* n2) {
-    if (!n1 || !n2) {
+    if (!n1 || !n2) return;
+
+    if (n1->balls.size() == 1 && n2->balls.size() == 1 && n1 != n2) {
+        // AABB Collision check
+        float dx = std::abs(n1->x - n2->x);
+        float dy = std::abs(n1->y - n2->y);
+        float widthSum = (n1->width + n2->width) / 2;
+        float heightSum = (n1->height + n2->height) / 2;
+
+        if (dx < widthSum && dy < heightSum) {
+            std::cout << "Collision Detected!" << std::endl;
+        }
         return;
     }
 
-    if (n1->balls.size() == 1 && n2->balls.size() == 1 && n1 != n2) {
-        float dx = n1->balls[0].getPosition().x - n2->balls[0].getPosition().x;
-        float dy = n1->balls[0].getPosition().y - n2->balls[0].getPosition().y;
-        float distance = std::sqrt(dx * dx + dy * dy);
-        float collisionDistance = n1->balls[0].getRadius() + n2->balls[0].getRadius();
-
-
-
-        if (distance < collisionDistance) {
-            //std::cout << "Collision Detected!" << std::endl;
-        }
-    }
-    else {
+    // Recursive checks for child nodes
+    if (n1->Left) {
         checkCollisions(n1->Left.get(), n2->Left.get());
         checkCollisions(n1->Left.get(), n2->Right.get());
+    }
+    if (n1->Right) {
         checkCollisions(n1->Right.get(), n2->Left.get());
         checkCollisions(n1->Right.get(), n2->Right.get());
     }
 }
 
-CollisionNode::CollisionNode(std::vector<Ball>& balls, Game& game) : balls(balls), Left(nullptr), Right(nullptr) {
-    if (balls.empty()) {
-        this->radius = 0;
+CollisionNode::CollisionNode(std::vector<Ball>& balls, Game& game, int depth, int maxDepth) : balls(balls), Left(nullptr), Right(nullptr) {
+    if (depth > maxDepth || balls.empty()) {
+        this->width = 0;
+        this->height = 0;
         this->x = 0;
         this->y = 0;
         return;
     }
 
-    float radius = balls[0].getRadius();
+    // Initialize AABB bounds
     float xMin = balls[0].getPosition().x, xMax = balls[0].getPosition().x;
     float yMin = balls[0].getPosition().y, yMax = balls[0].getPosition().y;
 
     for (const auto& ball : balls) {
         float ballX = ball.getPosition().x;
         float ballY = ball.getPosition().y;
-
-        xMin = std::min(xMin, ballX - radius);
-        xMax = std::max(xMax, ballX + radius);
-        yMin = std::min(yMin, ballY - radius);
-        yMax = std::max(yMax, ballY + radius);
+        xMin = std::min(xMin, ballX - ball.getRadius());
+        xMax = std::max(xMax, ballX + ball.getRadius());
+        yMin = std::min(yMin, ballY - ball.getRadius());
+        yMax = std::max(yMax, ballY + ball.getRadius());
     }
 
+    // Set AABB center and size
     this->x = (xMin + xMax) / 2.0f;
     this->y = (yMin + yMax) / 2.0f;
-    this->radius = std::max(xMax - x, yMax - y);
+    this->width = xMax - xMin;
+    this->height = yMax - yMin;
 
-    // DRAW THE CIRCLE
+    // Draw the AABB if grid is enabled
     if (isGrid) {
-        sf::CircleShape circle;
-        circle.setRadius(this->radius);
-        circle.setFillColor(sf::Color::Transparent);
-        circle.setOutlineColor(sf::Color::White);
-        circle.setOutlineThickness(1);
-        circle.setPosition(this->x - this->radius, this->y - this->radius);
-
-        game.Draw(circle);
+        sf::RectangleShape rect(sf::Vector2f(this->width, this->height));
+        rect.setFillColor(sf::Color::Transparent);
+        rect.setOutlineColor(sf::Color::White);
+        rect.setOutlineThickness(1);
+        rect.setPosition(this->x - this->width / 2, this->y - this->height / 2);
+        game.Draw(rect);
     }
 
-    int n = balls.size();
-    if (n > 1) {
-        n /= 2;
+    // Sort and split balls
+    std::sort(balls.begin(), balls.end(), [](const Ball& a, const Ball& b) {
+        return a.getPosition().x < b.getPosition().x;
+        });
 
-        std::vector<Ball> leftBalls(balls.begin(), balls.begin() + n);
-        std::vector<Ball> rightBalls(balls.begin() + n, balls.end());
+    size_t medianIndex = balls.size() / 2;
+    float medianX = balls[medianIndex].getPosition().x;
 
-        this->Left = std::make_unique<CollisionNode>(leftBalls, game); // Corrected
-        this->Right = std::make_unique<CollisionNode>(rightBalls, game); // Corrected
+    std::vector<Ball> leftBalls, rightBalls;
+    for (const auto& ball : balls) {
+        if (ball.getPosition().x < medianX) {
+            leftBalls.push_back(ball);
+        }
+        else {
+            rightBalls.push_back(ball);
+        }
+    }
+
+    if (!leftBalls.empty() && leftBalls.size() != balls.size()) {
+        this->Left = std::make_unique<CollisionNode>(leftBalls, game, depth + 1, maxDepth);
+    }
+    if (!rightBalls.empty() && rightBalls.size() != balls.size()) {
+        this->Right = std::make_unique<CollisionNode>(rightBalls, game, depth + 1, maxDepth);
     }
 }
