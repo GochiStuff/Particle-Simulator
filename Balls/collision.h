@@ -10,12 +10,13 @@
 
 class CollisionNode {
 public:
+
+    float x, y; 
+    float width, height; 
+
     std::vector<Ball> balls;
     std::unique_ptr<CollisionNode> Left;
     std::unique_ptr<CollisionNode> Right;
-
-    float x, y; // Center of the AABB
-    float width, height; // Dimensions of the AABB
 
     CollisionNode(std::vector<Ball>& balls, Game& game, int depth = 0, int maxDepth = 10);
 };

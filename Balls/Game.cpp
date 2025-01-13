@@ -9,18 +9,35 @@
 //IMPORTANT
 constexpr auto WindowH = 600;
 constexpr auto WindowW = 800;
-const float fps_limit = 120;
+const float fps_limit = 60;
 bool isCollisionAllowed = true;
 bool showGrid = true;
 const float cor = 1;
-bool showStats = true; // S for showing the stats .
+bool showStats = false; // S for showing the stats .
+
+//Controls 
+/*
+	-R restart - Yet to implement
+	-S stats toogle  - Done
+	-D Collision toogle - Done
+	-G Show Grid - Done 
+	-F Change the Balls Number 
+	-C Change the ball Radius 
+	-Esc Exit - Done
+	-X Gravity 
+	-V start Velocity 
+	-N Combine the ball of same colour 
+	-M change Mass
+	-B Change the balls color as per the velocity changes 
+*/ 
+
 
 
 // Balls
-const int numberOfBalls = 1000;
-const float radius = 3.0;
+const int numberOfBalls = 4;
+const float radius = 30;
 const sf::Vector2f startPos = { 300, 300 };
-const sf::Vector2f startVel = { 0, 0 };
+const sf::Vector2f startVel = { 100, 100 };
 const int velRandomFactor = 169; 
 const int posRandomFactor = 169; 
 std::vector<sf::Color> colours = {
@@ -146,7 +163,7 @@ void Game::Update()
 	}
 
 	//print stats
-	//TODO : add the feature to see the current stats  !! i.e. FPS and load
+	//TODO : add the feature to see the current stats  !! i.e. FPS and load REALTIME STATS
 	if (showStats)
 	{
 		sf::Text windowDimText, fpsText, nOfBalls, collisionText, showGrid_, corText, statsToggleText;
