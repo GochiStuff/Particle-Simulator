@@ -7,18 +7,18 @@
 #include<algorithm>
 
 //IMPORTANT
-constexpr auto WindowH = 1000;
-constexpr auto WindowW = 1500;
+constexpr auto WindowH = 600;
+constexpr auto WindowW = 800;
 const float fps_limit = 120;
-bool isCollisionAllowed = false;
-bool showGrid = false;
+bool isCollisionAllowed = true;
+bool showGrid = true;
 const float cor = 1;
 bool showStats = true; // S for showing the stats .
 
 
 // Balls
-const int numberOfBalls = 69000;
-const float radius = 1.0f;
+const int numberOfBalls = 100;
+const float radius = 3.0f;
 const sf::Vector2f startPos = { 300, 300 };
 const sf::Vector2f startVel = { 1, 1 };
 const int velRandomFactor = 169; 
